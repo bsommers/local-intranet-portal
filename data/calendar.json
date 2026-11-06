@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "title": "Local Server Architecture Deployment",
+    "date": "2026-11-06",
+    "time": "14:30",
+    "category": "Infrastructure",
+    "description": "Deploy local intranet portal with source tree viewer and plugin hooks"
+  },
+  {
+    "id": 2,
+    "title": "Ecosystem Sync & Backup Verification",
+    "date": "2026-11-07",
+    "time": "10:00",
+    "category": "Maintenance",
+    "description": "Verify rsync and git commits across ecosystem projects"
+  }
+]

@@ -1,0 +1,23 @@
+services:
+  local-portal:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: local-intranet-portal:latest
+    container_name: local-intranet-portal
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+    environment:
+      - PORT=8081
+      - SRC_ROOT=/sources/src
+      - ECO_ROOT=/sources/ecosystem
+    volumes:
+      # Bind-mount host source trees for code viewer (read-only)
+      - ${HOME}/src:/sources/src:ro
+      - ${HOME}/ecosystem:/sources/ecosystem:ro
+      # Bind-mount data and plugins for live edits without rebuilding
+      - ./data:/app/data
+      - ./reports:/app/reports
+      - ./plugins:/app/plugins
+      - ./logs:/app/logs

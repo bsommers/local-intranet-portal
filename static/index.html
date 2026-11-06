@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local Server Dashboard | 192.168.1.245</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+            },
+            surface: {
+              900: '#070a12',
+              850: '#0a0f1d',
+              800: '#0f172a',
+              750: '#15203b',
+              700: '#1e293b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- KaTeX CDN (CSS + JS) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+
+  <!-- PrismJS CDN (Theme + JS + Langs) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+  <!-- Marked.js for Markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#070a12] text-slate-200 antialiased h-screen flex overflow-hidden select-none">
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden backdrop-blur-sm"></div>
+
+  <!-- Sidebar Navigation -->
+  <aside id="sidebar" class="fixed lg:static top-0 bottom-0 left-0 z-40 w-64 bg-slate-900/90 border-r border-slate-800/80 flex flex-col justify-between transition-transform duration-300 -translate-x-full lg:translate-x-0 backdrop-blur-xl">
+    <div>
+      <!-- Header Logo / Host -->
+      <div class="p-4 border-b border-slate-800/80 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+            <i data-lucide="server" class="w-5 h-5 text-white"></i>
+          </div>
+          <div>
+            <div class="text-sm font-bold tracking-tight text-white flex items-center gap-1.5">
+              <span>LOCAL•NODE</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 font-mono">v2.4</span>
+            </div>
+            <div class="text-xs text-slate-400 font-mono">192.168.1.245:8080</div>
+          </div>
+        </div>
+        <button id="close-sidebar-btn" class="lg:hidden text-slate-400 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Live Node Status Indicator -->
+      <div class="px-4 py-2.5 bg-slate-950/40 border-b border-slate-800/50 flex items-center justify-between text-xs">
+        <div class="flex items-center space-x-2">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span class="text-slate-300 font-medium">Core Daemons Active</span>
+        </div>
+        <span id="header-uptime" class="font-mono text-slate-400 text-[11px]">up 14d 6h</span>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="p-3 space-y-1">
+        <a href="#dashboard" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 text-sm font-medium" data-target="dashboard">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-400"></i>
+            <span>Dashboard</span>
+          </div>
+          <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-sky-400 border border-slate-700">SYS</span>
+        </a>
+
+        <a href="#source-viewer" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 text-sm font-medium" data-target="source-viewer">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="code-2" class="w-4 h-4 text-slate-400"></i>
+            <span>Source Viewer</span>
+          </div>
+          <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-indigo-400 border border-slate-700">CODE</span>
+        </a>
+
+        <a href="#reports" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 text-sm font-medium" data-target="reports">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="file-text" class="w-4 h-4 text-slate-400"></i>
+            <span>Reports</span>
+          </div>
+          <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">DOCS</span>
+        </a>
+
+        <a href="#charts" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 text-sm font-medium" data-target="charts">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="activity" class="w-4 h-4 text-slate-400"></i>
+            <span>Charts & Metrics</span>
+          </div>
+          <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">LIVE</span>
+        </a>
+
+        <a href="#math" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 text-sm font-medium" data-target="math">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="calculator" class="w-4 h-4 text-slate-400"></i>
+            <span>Math & Scratchpad</span>
+          </div>
+          <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-amber-400 border border-slate-700">LaTeX</span>
+        </a>
+
+        <a href="#reading-list" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 text-sm font-medium" data-target="reading-list">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="bookmark" class="w-4 h-4 text-slate-400"></i>
+            <span>Reading Lists</span>
+          </div>
+          <span id="reading-badge-count" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">6</span>
+        </a>
+
+        <a href="#docs" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 text-sm font-medium" data-target="docs">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="book-open" class="w-4 h-4 text-slate-400"></i>
+            <span>Documentation</span>
+          </div>
+          <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">MD</span>
+        </a>
+
+        <a href="#calendar" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 text-sm font-medium" data-target="calendar">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>
+            <span>Calendar</span>
+          </div>
+          <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-purple-400 border border-slate-700">SYNC</span>
+        </a>
+
+        <a href="#api-plugins" class="nav-link flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 text-sm font-medium" data-target="api-plugins">
+          <div class="flex items-center space-x-3">
+            <i data-lucide="plug" class="w-4 h-4 text-slate-400"></i>
+            <span>REST & Plugins</span>
+          </div>
+          <span class="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">TEST</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Quick Server Stats Card in Sidebar Footer -->
+    <div class="p-3 border-t border-slate-800/80 bg-slate-950/30">
+      <div class="p-2.5 rounded-lg bg-slate-800/50 border border-slate-700/50 space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-400">RAM Util</span>
+          <span id="sidebar-ram-text" class="font-mono text-sky-400 font-semibold">4.8 / 16 GB (30%)</span>
+        </div>
+        <div class="w-full bg-slate-700/50 rounded-full h-1.5 overflow-hidden">
+          <div id="sidebar-ram-bar" class="bg-gradient-to-r from-sky-400 to-indigo-500 h-1.5 rounded-full" style="width: 30%"></div>
+        </div>
+        <div class="flex items-center justify-between pt-1 text-[11px] text-slate-400 font-mono">
+          <span>Host: bill@fedora</span>
+          <button id="quick-refresh-btn" title="Refresh Telemetry" class="hover:text-sky-400 transition-colors">
+            <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main View Area -->
+  <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#070a12]">
+
+    <!-- Top Navigation Bar -->
+    <header class="h-14 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md px-4 flex items-center justify-between z-20 shrink-0">
+      <div class="flex items-center space-x-3">
+        <button id="open-sidebar-btn" class="lg:hidden text-slate-400 hover:text-white p-1">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        
+        <div class="flex items-center space-x-2 text-sm">
+          <span class="text-slate-500">System</span>
+          <span class="text-slate-600">/</span>
+          <span id="page-title" class="font-semibold text-white tracking-wide">Dashboard</span>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <div class="hidden sm:flex items-center space-x-2 bg-slate-800/60 border border-slate-700/60 rounded-lg px-2.5 py-1 text-xs text-slate-300 font-mono">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>192.168.1.245</span>
+          <span class="text-slate-500">:</span>
+          <span class="text-sky-400 font-bold">8080</span>
+        </div>
+
+        <button id="btn-open-terminal-cmd" class="text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 flex items-center space-x-1.5 transition">
+          <i data-lucide="terminal" class="w-3.5 h-3.5 text-sky-400"></i>
+          <span class="hidden md:inline">Command Palette</span>
+          <kbd class="hidden md:inline text-[10px] bg-slate-900 px-1 py-0.5 rounded text-slate-400 border border-slate-700">Ctrl+K</kbd>
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Content Container -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-6 relative select-text" id="main-content">
+
+      <!-- ========================================== -->
+      <!-- PAGE 1: DASHBOARD -->
+      <!-- ========================================== -->
+      <section id="view-dashboard" class="page-view space-y-6">
+        <!-- Quick Stats Top Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- CPU Gauge Card -->
+          <div class="glass-panel rounded-xl p-4 glass-panel-hover flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">CPU Utilization</span>
+              <div class="p-2 rounded-lg bg-sky-500/10 text-sky-400">
+                <i data-lucide="cpu" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="my-3">
+              <div class="flex items-baseline space-x-2">
+                <span id="dash-cpu-val" class="text-3xl font-bold font-mono text-white">18.4%</span>
+                <span class="text-xs text-emerald-400 flex items-center font-mono">
+                  <i data-lucide="arrow-down-right" class="w-3 h-3 mr-0.5"></i>-2.1%
+                </span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
+                <div id="dash-cpu-bar" class="bg-sky-400 h-1.5 rounded-full transition-all duration-500" style="width: 18.4%"></div>
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-400 font-mono flex justify-between">
+              <span>8 Cores / 16 Threads</span>
+              <span>3.80 GHz</span>
+            </div>
+          </div>
+
+          <!-- Memory Gauge Card -->
+          <div class="glass-panel rounded-xl p-4 glass-panel-hover flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Memory Usage</span>
+              <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+                <i data-lucide="layers" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="my-3">
+              <div class="flex items-baseline space-x-2">
+                <span id="dash-mem-val" class="text-3xl font-bold font-mono text-white">4.8 GB</span>
+                <span class="text-xs text-slate-400 font-mono">/ 16.0 GB</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
+                <div id="dash-mem-bar" class="bg-indigo-400 h-1.5 rounded-full transition-all duration-500" style="width: 30%"></div>
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-400 font-mono flex justify-between">
+              <span>Swap: 0.8 / 8.0 GB</span>
+              <span class="text-indigo-400 font-semibold">30%</span>
+            </div>
+          </div>
+
+          <!-- Storage Gauge Card -->
+          <div class="glass-panel rounded-xl p-4 glass-panel-hover flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Storage NVMe</span>
+              <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                <i data-lucide="hard-drive" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="my-3">
+              <div class="flex items-baseline space-x-2">
+                <span id="dash-disk-val" class="text-3xl font-bold font-mono text-white">214 GB</span>
+                <span class="text-xs text-slate-400 font-mono">/ 953 GB</span>
+              </div>
+              <div class="w-full bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
+                <div id="dash-disk-bar" class="bg-emerald-400 h-1.5 rounded-full" style="width: 22.4%"></div>
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-400 font-mono flex justify-between">
+              <span>Free: 739 GB</span>
+              <span class="text-emerald-400 font-semibold">22.4% Used</span>
+            </div>
+          </div>
+
+          <!-- Network IO Card -->
+          <div class="glass-panel rounded-xl p-4 glass-panel-hover flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Network Throughput</span>
+              <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                <i data-lucide="network" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="my-3">
+              <div class="flex items-baseline space-x-2">
+                <span id="dash-net-val" class="text-3xl font-bold font-mono text-white">12.4 MB/s</span>
+                <span class="text-xs text-slate-400 font-mono">eth0</span>
+              </div>
+              <div class="flex items-center space-x-3 text-xs font-mono mt-2">
+                <span class="text-sky-400 flex items-center">
+                  <i data-lucide="arrow-down" class="w-3 h-3 mr-0.5"></i>
+                  <span id="dash-rx-val">9.8 MB/s</span>
+                </span>
+                <span class="text-amber-400 flex items-center">
+                  <i data-lucide="arrow-up" class="w-3 h-3 mr-0.5"></i>
+                  <span id="dash-tx-val">2.6 MB/s</span>
+                </span>
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-400 font-mono flex justify-between">
+              <span>IP: 192.168.1.245</span>
+              <span>Port: 8080</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle Row: Mini Overview Chart & Quick Services -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 glass-panel rounded-xl p-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-semibold text-white">Live Node Telemetry</h3>
+                <p class="text-xs text-slate-400">Real-time CPU and Memory tracking (updates every 2s)</p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                  <span class="w-1.5 h-1.5 rounded-full bg-sky-400 mr-1.5 animate-pulse"></span>
+                  STREAMING
+                </span>
+              </div>
+            </div>
+            <div class="h-64 relative">
+              <canvas id="dashTelemetryChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Quick Service Directory & System Summary -->
+          <div class="glass-panel rounded-xl p-5 space-y-4 flex flex-col justify-between">
+            <div>
+              <h3 class="font-semibold text-white mb-1">Local Endpoints & Ports</h3>
+              <p class="text-xs text-slate-400 mb-4">Quick access to local stack and proxies</p>
+              <div class="space-y-2">
+                <a href="http://192.168.1.245:8080/api/stats" target="_blank" class="flex items-center justify-between p-2.5 rounded-lg bg-slate-800/40 hover:bg-slate-800/80 border border-slate-700/50 transition">
+                  <div class="flex items-center space-x-2.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span class="text-xs font-mono text-slate-200">/api/stats</span>
+                  </div>
+                  <span class="text-[10px] font-mono text-slate-400">JSON API</span>
+                </a>
+                <a href="http://192.168.1.245:8080/api/plugins" target="_blank" class="flex items-center justify-between p-2.5 rounded-lg bg-slate-800/40 hover:bg-slate-800/80 border border-slate-700/50 transition">
+                  <div class="flex items-center space-x-2.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span class="text-xs font-mono text-slate-200">/api/plugins</span>
+                  </div>
+                  <span class="text-[10px] font-mono text-slate-400">Ext Engine</span>
+                </a>
+                <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-800/40 border border-slate-700/50">
+                  <div class="flex items-center space-x-2.5">
+                    <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+                    <span class="text-xs font-mono text-slate-200">Nginx Reverse Proxy</span>
+                  </div>
+                  <span class="text-[10px] font-mono text-slate-400">Port 80/443</span>
+                </div>
+                <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-800/40 border border-slate-700/50">
+                  <div class="flex items-center space-x-2.5">
+                    <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                    <span class="text-xs font-mono text-slate-200">Vite/HMR Dev Port</span>
+                  </div>
+                  <span class="text-[10px] font-mono text-slate-400">Port 5173</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Host info pill -->
+            <div class="p-3 rounded-lg bg-slate-950/60 border border-slate-800 font-mono text-xs space-y-1 text-slate-400">
+              <div class="flex justify-between">
+                <span>OS Kernel:</span>
+                <span class="text-slate-300">Linux 6.8.9-300.fc40</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Architecture:</span>
+                <span class="text-slate-300">x86_64</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Load Avg:</span>
+                <span id="dash-load-avg" class="text-sky-400 font-semibold">0.42, 0.58, 0.65</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Row: Activity Feed & Quick Actions -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 glass-panel rounded-xl p-5 space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="terminal" class="w-4 h-4 text-sky-400"></i>
+                <h3 class="font-semibold text-white text-sm">System Event Log & Audit</h3>
+              </div>
+              <button id="clear-audit-log-btn" class="text-xs text-slate-400 hover:text-white font-mono">Clear</button>
+            </div>
+            <div id="system-event-log" class="font-mono text-xs space-y-2 max-h-52 overflow-y-auto pr-2">
+              <div class="flex items-start space-x-2 text-slate-400">
+                <span class="text-slate-500">[14:30:12]</span>
+                <span class="text-emerald-400 font-semibold">[INFO]</span>
+                <span class="text-slate-300">Local web server daemon initialized on 0.0.0.0:8080</span>
+              </div>
+              <div class="flex items-start space-x-2 text-slate-400">
+                <span class="text-slate-500">[14:30:15]</span>
+                <span class="text-sky-400 font-semibold">[SYS]</span>
+                <span class="text-slate-300">Source explorer mounted: ~/src and ~/ecosystem</span>
+              </div>
+              <div class="flex items-start space-x-2 text-slate-400">
+                <span class="text-slate-500">[14:30:18]</span>
+                <span class="text-purple-400 font-semibold">[PLUGINS]</span>
+                <span class="text-slate-300">Dynamic plugin runner ready: math_runner, git_inspector</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shortcuts -->
+          <div class="glass-panel rounded-xl p-5 space-y-3 flex flex-col justify-between">
+            <h3 class="font-semibold text-white text-sm">System Shortcuts</h3>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <a href="#source-viewer" class="p-3 rounded-lg bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 flex flex-col items-center justify-center text-center group transition">
+                <i data-lucide="folder-code" class="w-5 h-5 text-indigo-400 mb-1 group-hover:scale-110 transition-transform"></i>
+                <span class="text-slate-300 font-medium">Browse Code</span>
+              </a>
+              <a href="#charts" class="p-3 rounded-lg bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 flex flex-col items-center justify-center text-center group transition">
+                <i data-lucide="bar-chart-3" class="w-5 h-5 text-emerald-400 mb-1 group-hover:scale-110 transition-transform"></i>
+                <span class="text-slate-300 font-medium">Full Metrics</span>
+              </a>
+              <a href="#math" class="p-3 rounded-lg bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 flex flex-col items-center justify-center text-center group transition">
+                <i data-lucide="function-square" class="w-5 h-5 text-amber-400 mb-1 group-hover:scale-110 transition-transform"></i>
+                <span class="text-slate-300 font-medium">Scratchpad</span>
+              </a>
+              <a href="#api-plugins" class="p-3 rounded-lg bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 flex flex-col items-center justify-center text-center group transition">
+                <i data-lucide="send" class="w-5 h-5 text-sky-400 mb-1 group-hover:scale-110 transition-transform"></i>
+                <span class="text-slate-300 font-medium">API Tester</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- PAGE 2: SOURCE VIEWER -->
+      <!-- ========================================== -->
+      <section id="view-source-viewer" class="page-view hidden h-[calc(100vh-6.5rem)] flex flex-col">
+        <!-- Top Toolbar -->
+        <div class="glass-panel rounded-t-xl p-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
+          <div class="flex items-center space-x-2">
+            <!-- Root select toggle -->
+            <div class="inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800 text-xs font-mono">
+              <button id="src-btn-root-src" class="px-3 py-1 rounded bg-sky-500/20 text-sky-400 font-semibold transition">~/src</button>
+              <button id="src-btn-root-ecosystem" class="px-3 py-1 rounded text-slate-400 hover:text-white transition">~/ecosystem</button>
+            </div>
+            
+            <span class="text-slate-600">|</span>
+
+            <!-- Breadcrumbs -->
+            <div id="src-breadcrumbs" class="flex items-center space-x-1.5 text-xs font-mono text-slate-300 overflow-x-auto max-w-md py-1">
+              <span class="text-sky-400">~/src</span>
+              <span class="text-slate-600">/</span>
+              <span>presntation</span>
+              <span class="text-slate-600">/</span>
+              <span>local-webserver</span>
+              <span class="text-slate-600">/</span>
+              <span class="text-white font-semibold">app.js</span>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <!-- Search filter -->
+            <div class="relative">
+              <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400"></i>
+              <input id="src-filter-input" type="text" placeholder="Filter files..." class="w-40 sm:w-56 bg-slate-950/80 border border-slate-700/60 rounded-lg pl-8 pr-3 py-1 text-xs text-slate-200 focus:outline-none focus:border-sky-500 font-mono">
+            </div>
+
+            <!-- Actions -->
+            <button id="src-copy-btn" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs flex items-center space-x-1" title="Copy code">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Copy</span>
+            </button>
+            <button id="src-raw-btn" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs flex items-center space-x-1" title="Toggle Wrap">
+              <i data-lucide="wrap-text" class="w-3.5 h-3.5"></i>
+              <span class="hidden sm:inline">Wrap</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Split Pane: File Tree on left, Code view on right -->
+        <div class="flex-1 glass-panel rounded-b-xl border-t-0 flex overflow-hidden">
+          <!-- File Tree Nav -->
+          <div class="w-64 sm:w-72 border-r border-slate-800 flex flex-col bg-slate-950/40 shrink-0">
+            <div class="p-2 border-b border-slate-800/80 text-[11px] font-mono text-slate-400 flex items-center justify-between uppercase tracking-wider">
+              <span>EXPLORER</span>
+              <button id="src-tree-refresh-btn" class="hover:text-white">
+                <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+              </button>
+            </div>
+            <div id="src-file-tree" class="flex-1 overflow-y-auto p-2 space-y-0.5 text-xs font-mono">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Code Display Panel -->
+          <div class="flex-1 flex flex-col min-w-0 bg-[#080c16]">
+            <!-- File info bar -->
+            <div class="px-4 py-1.5 border-b border-slate-800/80 bg-slate-900/40 flex items-center justify-between text-xs font-mono text-slate-400 shrink-0">
+              <div class="flex items-center space-x-3">
+                <span id="src-file-name" class="text-slate-200 font-semibold">app.js</span>
+                <span id="src-file-meta">85 lines • 2.6 KB • JavaScript</span>
+              </div>
+              <span id="src-lang-badge" class="px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20 text-[10px]">JS</span>
+            </div>
+
+            <!-- Code content -->
+            <div class="flex-1 overflow-auto relative p-4 code-container">
+              <pre id="src-code-pre" class="h-full"><code id="src-code-block" class="language-javascript">// Loading source file...</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- PAGE 3: REPORTS -->
+      <!-- ========================================== -->
+      <section id="view-reports" class="page-view hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">System Reports & Benchmarks</h2>
+            <p class="text-xs text-slate-400">Generated Markdown and HTML audit summaries, performance suites, and architecture reviews</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button id="reports-new-btn" class="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs flex items-center space-x-1.5 shadow-lg shadow-sky-500/20 transition">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              <span>Generate Report</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Reports List -->
+          <div class="glass-panel rounded-xl p-4 space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+              <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Reports Archive</span>
+              <span id="reports-count" class="text-xs font-mono text-sky-400">4 available</span>
+            </div>
+            <div id="reports-list-container" class="space-y-2">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Report Viewer Pane -->
+          <div class="lg:col-span-2 glass-panel rounded-xl p-6 flex flex-col space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div>
+                <h3 id="report-view-title" class="text-lg font-bold text-white">System Performance & Health Audit</h3>
+                <p id="report-view-meta" class="text-xs text-slate-400 font-mono">Run: #2026-11-06-01 • Author: Automated CI/CD • Status: PASSED</p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button id="report-print-btn" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center space-x-1 border border-slate-700">
+                  <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                  <span class="hidden sm:inline">Print</span>
+                </button>
+                <button id="report-download-btn" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center space-x-1 border border-slate-700">
+                  <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                  <span class="hidden sm:inline">Raw</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Rendered Markdown Body -->
+            <div id="report-rendered-content" class="prose prose-invert max-w-none text-sm text-slate-300 leading-relaxed overflow-y-auto max-h-[600px] pr-2">
+              <!-- Rendered markdown inserted here -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- PAGE 4: CHARTS & METRICS -->
+      <!-- ========================================== -->
+      <section id="view-charts" class="page-view hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Hardware & Cluster Metrics</h2>
+            <p class="text-xs text-slate-400">High-resolution metrics and continuous load telemetry</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="inline-flex rounded-lg bg-slate-900 border border-slate-800 p-0.5 text-xs font-mono">
+              <button class="chart-timeframe-btn active px-2.5 py-1 rounded bg-sky-500/20 text-sky-400 font-medium" data-range="1m">1m</button>
+              <button class="chart-timeframe-btn px-2.5 py-1 rounded text-slate-400 hover:text-white" data-range="5m">5m</button>
+              <button class="chart-timeframe-btn px-2.5 py-1 rounded text-slate-400 hover:text-white" data-range="15m">15m</button>
+              <button class="chart-timeframe-btn px-2.5 py-1 rounded text-slate-400 hover:text-white" data-range="1h">1h</button>
+            </div>
+            <button id="charts-pause-btn" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 flex items-center space-x-1">
+              <i data-lucide="pause" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span>Live</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- CPU Timeline Chart -->
+          <div class="glass-panel rounded-xl p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-semibold text-white text-sm">CPU Core Utilization (%)</h3>
+                <p class="text-[11px] text-slate-400">User vs System execution cycles</p>
+              </div>
+              <span class="text-xs font-mono text-sky-400 font-bold" id="metrics-cpu-now">18.4%</span>
+            </div>
+            <div class="h-64">
+              <canvas id="chartCpuHistory"></canvas>
+            </div>
+          </div>
+
+          <!-- Memory Timeline Chart -->
+          <div class="glass-panel rounded-xl p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-semibold text-white text-sm">Memory Distribution (MB)</h3>
+                <p class="text-[11px] text-slate-400">Resident Set, Cache, Buffers, Free</p>
+              </div>
+              <span class="text-xs font-mono text-indigo-400 font-bold" id="metrics-mem-now">4,812 MB</span>
+            </div>
+            <div class="h-64">
+              <canvas id="chartMemDistribution"></canvas>
+            </div>
+          </div>
+
+          <!-- Network IO Timeline Chart -->
+          <div class="glass-panel rounded-xl p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-semibold text-white text-sm">Network I/O Bandwidth</h3>
+                <p class="text-[11px] text-slate-400">Inbound (RX) vs Outbound (TX) KB/s</p>
+              </div>
+              <span class="text-xs font-mono text-emerald-400 font-bold" id="metrics-net-now">12.4 MB/s</span>
+            </div>
+            <div class="h-64">
+              <canvas id="chartNetworkIO"></canvas>
+            </div>
+          </div>
+
+          <!-- Disk Activity / IOPS Chart -->
+          <div class="glass-panel rounded-xl p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-semibold text-white text-sm">Disk Throughput & IOPS</h3>
+                <p class="text-[11px] text-slate-400">NVMe Read/Write transactions</p>
+              </div>
+              <span class="text-xs font-mono text-amber-400 font-bold">142 IOPS</span>
+            </div>
+            <div class="h-64">
+              <canvas id="chartDiskIOPS"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- PAGE 5: MATH & SCRATCHPAD -->
+      <!-- ========================================== -->
+      <section id="view-math" class="page-view hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Mathematical Scratchpad & LaTeX Sandbox</h2>
+            <p class="text-xs text-slate-400">Interactive formula authoring with KaTeX CDN and computational evaluator (`/api/plugins/math_runner`)</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <select id="math-presets-select" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-2.5 py-1.5 text-slate-300 focus:outline-none focus:border-sky-500 font-mono">
+              <option value="">Load Formula Preset...</option>
+              <option value="fourier">Fourier Transform</option>
+              <option value="gaussian">Gaussian Distribution</option>
+              <option value="schrodinger">Schrödinger Equation</option>
+              <option value="euler">Euler Identity & Complex Analysis</option>
+              <option value="bayes">Bayes' Theorem</option>
+              <option value="matrix">Matrix Transformation</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- LaTeX Editor & Live Preview -->
+          <div class="space-y-4">
+            <div class="glass-panel rounded-xl p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">LaTeX Input Expression</span>
+                <span class="text-[10px] font-mono text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">KaTeX v0.16.8</span>
+              </div>
+              <textarea id="katex-input" rows="5" class="w-full bg-[#080c16] border border-slate-800 rounded-lg p-3 text-sm font-mono text-sky-300 focus:outline-none focus:border-sky-500 leading-relaxed resize-none" placeholder="Enter LaTeX formula here (e.g., \int_{-\infty}^\infty e^{-x^2} dx = \sqrt{\pi})">\int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}</textarea>
+            </div>
+
+            <!-- KaTeX Output Box -->
+            <div class="glass-panel rounded-xl p-5 space-y-2">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Rendered Math Preview</span>
+                <button id="katex-copy-btn" class="text-xs text-slate-400 hover:text-white flex items-center space-x-1">
+                  <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                  <span>Copy LaTeX</span>
+                </button>
+              </div>
+              <div id="katex-rendered-output" class="p-6 bg-slate-950/60 rounded-lg flex items-center justify-center min-h-[120px] text-xl text-white overflow-x-auto">
+                <!-- KaTeX will inject math here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Computational REPL / Scratchpad Notebook -->
+          <div class="glass-panel rounded-xl p-5 flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                  <i data-lucide="terminal" class="w-4 h-4 text-amber-400"></i>
+                  <h3 class="font-semibold text-white text-sm">Calculative REPL & Plugin Runner</h3>
+                </div>
+                <span class="text-[10px] font-mono text-emerald-400">/api/plugins/math_runner</span>
+              </div>
+
+              <!-- History Log -->
+              <div id="scratchpad-history" class="mt-4 space-y-2 max-h-72 overflow-y-auto pr-1 font-mono text-xs">
+                <!-- Computation history rows -->
+              </div>
+            </div>
+
+            <!-- Input Box -->
+            <div class="pt-3 border-t border-slate-800 space-y-2">
+              <div class="flex space-x-2">
+                <input id="scratchpad-input" type="text" placeholder="e.g. 2 * pi * 6371 or sqrt(144) + log(100)" class="flex-1 bg-slate-950 border border-slate-700/60 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-amber-400">
+                <button id="scratchpad-eval-btn" class="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center space-x-1.5 transition">
+                  <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+                  <span>Eval</span>
+                </button>
+              </div>
+              <div class="flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                <span>Functions: sin, cos, sqrt, log, pow, abs, pi, e</span>
+                <button id="scratchpad-clear-btn" class="hover:text-slate-300">Clear notebook</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- PAGE 6: READING LISTS -->
+      <!-- ========================================== -->
+      <section id="view-reading-list" class="page-view hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Technical Reading & Reference Queue</h2>
+            <p class="text-xs text-slate-400">Track papers, engineering RFCs, specifications, and books (`/api/reading-list`)</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button id="reading-add-modal-btn" class="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs flex items-center space-x-1.5 shadow-lg shadow-sky-500/20 transition">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              <span>Add Resource</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="glass-panel rounded-xl p-3 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center space-x-1 overflow-x-auto text-xs" id="reading-tag-filters">
+            <button class="reading-tag-btn active px-3 py-1 rounded-lg bg-sky-500/20 text-sky-400 font-medium border border-sky-500/30" data-tag="ALL">All Items</button>
+            <button class="reading-tag-btn px-3 py-1 rounded-lg text-slate-400 hover:text-white" data-tag="Systems">Systems</button>
+            <button class="reading-tag-btn px-3 py-1 rounded-lg text-slate-400 hover:text-white" data-tag="Architecture">Architecture</button>
+            <button class="reading-tag-btn px-3 py-1 rounded-lg text-slate-400 hover:text-white" data-tag="AI/ML">AI / ML</button>
+            <button class="reading-tag-btn px-3 py-1 rounded-lg text-slate-400 hover:text-white" data-tag="Rust/Go">Rust & Go</button>
+          </div>
+
+          <div class="relative">
+            <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400"></i>
+            <input id="reading-search-input" type="text" placeholder="Search reading queue..." class="w-48 sm:w-64 bg-slate-950/80 border border-slate-700/60 rounded-lg pl-8 pr-3 py-1 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+          </div>
+        </div>
+
+        <!-- Reading Items Grid -->
+        <div id="reading-items-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- PAGE 7: DOCUMENTATION -->
+      <!-- ========================================== -->
+      <section id="view-docs" class="page-view hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">System Documentation Hub</h2>
+            <p class="text-xs text-slate-400">Internal architectural references, server guides, and runtime operational manual</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <!-- Docs Navigation list -->
+          <div class="glass-panel rounded-xl p-4 space-y-2">
+            <div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider pb-2 border-b border-slate-800">TABLE OF CONTENTS</div>
+            <nav id="docs-nav" class="space-y-1 text-xs">
+              <!-- Dynamically populated -->
+            </nav>
+          </div>
+
+          <!-- Docs Markdown Reader View -->
+          <div class="lg:col-span-3 glass-panel rounded-xl p-6 overflow-y-auto max-h-[750px]">
+            <div id="docs-content-container" class="prose prose-invert max-w-none text-slate-300 leading-relaxed">
+              <!-- Rendered doc content -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- PAGE 8: CALENDAR -->
+      <!-- ========================================== -->
+      <section id="view-calendar" class="page-view hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Engineering Calendar & Scheduled Tasks</h2>
+            <p class="text-xs text-slate-400">Cron schedules, deployment dates, and maintenance windows (`/api/calendar`)</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button id="calendar-prev-month" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300">
+              <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            </button>
+            <span id="calendar-month-year" class="text-sm font-semibold font-mono text-white px-3">November 2026</span>
+            <button id="calendar-next-month" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300">
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+            <button id="calendar-add-event-btn" class="ml-2 px-3 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-400 text-white font-semibold text-xs flex items-center space-x-1 shadow-lg shadow-purple-500/20 transition">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              <span>Add Event</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Calendar Grid Pane -->
+          <div class="lg:col-span-2 glass-panel rounded-xl p-4">
+            <!-- Day Names -->
+            <div class="grid grid-cols-7 gap-1 text-center font-mono text-xs text-slate-400 pb-2 border-b border-slate-800 mb-2">
+              <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+            </div>
+            <!-- Month Days Grid -->
+            <div id="calendar-grid" class="grid grid-cols-7 gap-1">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Selected Day Agenda / Scheduled Events -->
+          <div class="glass-panel rounded-xl p-5 space-y-4 flex flex-col justify-between">
+            <div>
+              <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
+                <div>
+                  <h3 class="font-semibold text-white text-sm">Scheduled Events</h3>
+                  <p id="calendar-selected-date-label" class="text-xs text-sky-400 font-mono">Today, November 6, 2026</p>
+                </div>
+                <span class="p-1.5 rounded-lg bg-purple-500/10 text-purple-400">
+                  <i data-lucide="calendar-days" class="w-4 h-4"></i>
+                </span>
+              </div>
+              <div id="calendar-agenda-list" class="mt-4 space-y-2.5 max-h-96 overflow-y-auto pr-1">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Mini Cron status -->
+            <div class="p-3 rounded-lg bg-slate-950/60 border border-slate-800 text-xs font-mono space-y-1.5 text-slate-400">
+              <div class="flex items-center justify-between text-slate-300 font-medium">
+                <span class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5"></span>Next Auto-Sync</span>
+                <span class="text-emerald-400">00:00 UTC</span>
+              </div>
+              <p class="text-[11px] text-slate-500">Autonomous snapshot and database replication cron job</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- PAGE 9: REST & PLUGINS -->
+      <!-- ========================================== -->
+      <section id="view-api-plugins" class="page-view hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">REST API & Dynamic Plugin Explorer</h2>
+            <p class="text-xs text-slate-400">Interactive API console with live request dispatch and dynamic extension modules (`/api/*`)</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="inline-flex items-center px-2.5 py-1 rounded text-xs font-mono bg-sky-500/10 text-sky-400 border border-sky-500/20">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 mr-1 text-emerald-400"></i>
+              CORS / Proxy Active
+            </span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left: Endpoints & Plugins Catalog -->
+          <div class="space-y-4">
+            <!-- Endpoints -->
+            <div class="glass-panel rounded-xl p-4 space-y-3">
+              <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">REST Endpoints</span>
+              <div class="space-y-1.5 text-xs font-mono" id="api-endpoints-list">
+                <button class="api-endpoint-item w-full text-left p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 border border-slate-700/60 flex items-center justify-between transition" data-method="GET" data-path="/api/stats">
+                  <div class="flex items-center space-x-2">
+                    <span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">GET</span>
+                    <span class="text-slate-200">/api/stats</span>
+                  </div>
+                  <span class="text-[10px] text-slate-500">System metrics</span>
+                </button>
+                <button class="api-endpoint-item w-full text-left p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 border border-slate-700/60 flex items-center justify-between transition" data-method="GET" data-path="/api/source">
+                  <div class="flex items-center space-x-2">
+                    <span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">GET</span>
+                    <span class="text-slate-200">/api/source</span>
+                  </div>
+                  <span class="text-[10px] text-slate-500">Files tree</span>
+                </button>
+                <button class="api-endpoint-item w-full text-left p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 border border-slate-700/60 flex items-center justify-between transition" data-method="GET" data-path="/api/reading-list">
+                  <div class="flex items-center space-x-2">
+                    <span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">GET</span>
+                    <span class="text-slate-200">/api/reading-list</span>
+                  </div>
+                  <span class="text-[10px] text-slate-500">Queue items</span>
+                </button>
+                <button class="api-endpoint-item w-full text-left p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 border border-slate-700/60 flex items-center justify-between transition" data-method="POST" data-path="/api/reading-list" data-payload='{"title":"New Paper","tag":"Architecture","url":"https://arxiv.org"}'>
+                  <div class="flex items-center space-x-2">
+                    <span class="px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-400 text-[10px] font-bold">POST</span>
+                    <span class="text-slate-200">/api/reading-list</span>
+                  </div>
+                  <span class="text-[10px] text-slate-500">Create item</span>
+                </button>
+                <button class="api-endpoint-item w-full text-left p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 border border-slate-700/60 flex items-center justify-between transition" data-method="GET" data-path="/api/calendar">
+                  <div class="flex items-center space-x-2">
+                    <span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">GET</span>
+                    <span class="text-slate-200">/api/calendar</span>
+                  </div>
+                  <span class="text-[10px] text-slate-500">Schedule</span>
+                </button>
+                <button class="api-endpoint-item w-full text-left p-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 border border-slate-700/60 flex items-center justify-between transition" data-method="POST" data-path="/api/plugins/math_runner" data-payload='{"expr":"sqrt(256) * 4"}'>
+                  <div class="flex items-center space-x-2">
+                    <span class="px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[10px] font-bold">POST</span>
+                    <span class="text-slate-200">/api/plugins/math_runner</span>
+                  </div>
+                  <span class="text-[10px] text-slate-500">Math Plugin</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Active Plugins List -->
+            <div class="glass-panel rounded-xl p-4 space-y-3">
+              <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Dynamic Plugins (/api/plugins/*)</span>
+              <div class="space-y-2 text-xs" id="api-plugins-list">
+                <div class="p-2.5 rounded-lg bg-slate-800/40 border border-slate-700/50 flex items-center justify-between">
+                  <div>
+                    <div class="font-semibold text-white flex items-center space-x-1.5">
+                      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span>math_runner</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-mono">Arbitrary precision & expression runner</p>
+                  </div>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">READY</span>
+                </div>
+                <div class="p-2.5 rounded-lg bg-slate-800/40 border border-slate-700/50 flex items-center justify-between">
+                  <div>
+                    <div class="font-semibold text-white flex items-center space-x-1.5">
+                      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                      <span>git_inspector</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-mono">Repository status & commit diff inspector</p>
+                  </div>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">READY</span>
+                </div>
+                <div class="p-2.5 rounded-lg bg-slate-800/40 border border-slate-700/50 flex items-center justify-between">
+                  <div>
+                    <div class="font-semibold text-white flex items-center space-x-1.5">
+                      <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+                      <span>file_indexer</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-mono">Real-time fs watcher for ~/src</p>
+                  </div>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">ACTIVE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Interactive Swagger-like Request/Response Console -->
+          <div class="lg:col-span-2 glass-panel rounded-xl p-5 space-y-4 flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-semibold text-white text-sm">Interactive Request Console</h3>
+                <span id="api-request-status-indicator" class="text-xs font-mono text-slate-400">Ready</span>
+              </div>
+
+              <!-- Request URL & Method bar -->
+              <div class="flex space-x-2">
+                <select id="api-method-select" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono font-bold text-sky-400 focus:outline-none focus:border-sky-500">
+                  <option value="GET">GET</option>
+                  <option value="POST">POST</option>
+                  <option value="PUT">PUT</option>
+                  <option value="DELETE">DELETE</option>
+                </select>
+                <input id="api-path-input" type="text" value="/api/stats" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-sky-500">
+                <button id="api-send-btn" class="px-5 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs flex items-center space-x-1.5 shadow-lg shadow-sky-500/20 transition">
+                  <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                  <span>Send</span>
+                </button>
+              </div>
+
+              <!-- Payload Editor (for POST/PUT) -->
+              <div id="api-payload-group" class="space-y-1.5">
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                  <span>JSON Request Body</span>
+                  <span class="font-mono text-[10px]">application/json</span>
+                </div>
+                <textarea id="api-payload-input" rows="4" class="w-full bg-[#080c16] border border-slate-800 rounded-lg p-3 text-xs font-mono text-emerald-300 focus:outline-none focus:border-sky-500 resize-none" placeholder="{}"></textarea>
+              </div>
+
+              <!-- Response Pane -->
+              <div class="space-y-2">
+                <div class="flex items-center justify-between text-xs font-mono">
+                  <span class="text-slate-400">Response Payload</span>
+                  <div class="flex items-center space-x-3">
+                    <span id="api-response-code" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">200 OK</span>
+                    <span id="api-response-time" class="text-slate-400 text-[11px]">12ms</span>
+                  </div>
+                </div>
+                <div class="relative">
+                  <pre class="bg-[#080c16] border border-slate-800 rounded-lg p-4 text-xs font-mono text-slate-200 max-h-72 overflow-auto"><code id="api-response-body" class="language-json">{
+  "status": "online",
+  "host": "192.168.1.245:8080",
+  "message": "Click 'Send' to dispatch an API request"
+}</code></pre>
+                  <button id="api-copy-response-btn" class="absolute top-3 right-3 p-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white text-xs border border-slate-700" title="Copy response">
+                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-[11px] text-slate-500 font-mono pt-3 border-t border-slate-800">
+              * Supports direct relative endpoints (`/api/...`) or dynamic mock fallback when offline.
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Command Palette Modal (Ctrl+K) -->
+  <div id="cmd-palette-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-start justify-center pt-20 p-4">
+    <div class="glass-panel w-full max-w-xl rounded-2xl overflow-hidden shadow-2xl border border-slate-700/80 animate-in fade-in duration-150">
+      <div class="p-4 border-b border-slate-800 flex items-center space-x-3">
+        <i data-lucide="search" class="w-5 h-5 text-sky-400"></i>
+        <input id="cmd-palette-input" type="text" placeholder="Type a command or jump to page..." class="flex-1 bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none font-mono">
+        <kbd class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-400 border border-slate-700">ESC</kbd>
+      </div>
+      <div id="cmd-palette-results" class="max-h-80 overflow-y-auto p-2 space-y-1 text-xs font-mono">
+        <!-- Command items -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Reading Resource Modal -->
+  <div id="modal-reading-add" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 space-y-4 border border-slate-700/80">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-white text-sm">Add Reading Resource</h3>
+        <button id="modal-reading-close-btn" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="reading-add-form" class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Title</label>
+          <input id="reading-form-title" required type="text" placeholder="e.g. Raft Consensus Algorithm RFC" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-sky-500">
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">URL or File Path</label>
+          <input id="reading-form-url" type="text" placeholder="https://... or ~/docs/paper.pdf" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-sky-500 font-mono">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 mb-1">Tag</label>
+            <select id="reading-form-tag" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-sky-500">
+              <option value="Systems">Systems</option>
+              <option value="Architecture">Architecture</option>
+              <option value="AI/ML">AI/ML</option>
+              <option value="Rust/Go">Rust/Go</option>
+              <option value="Security">Security</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Priority</label>
+            <select id="reading-form-priority" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-sky-500">
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+        </div>
+        <div class="pt-3 flex justify-end space-x-2">
+          <button type="button" id="reading-form-cancel" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold shadow-lg shadow-sky-500/20">Add Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Calendar Event Modal -->
+  <div id="modal-calendar-add" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-md rounded-2xl p-6 space-y-4 border border-slate-700/80">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-white text-sm">Schedule New Event</h3>
+        <button id="modal-cal-close-btn" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="cal-add-form" class="space-y-3 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">Event Title</label>
+          <input id="cal-form-title" required type="text" placeholder="e.g. Cluster Kernel Upgrade" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-purple-500">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-400 mb-1">Date</label>
+            <input id="cal-form-date" required type="date" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-purple-500 font-mono">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Time</label>
+            <input id="cal-form-time" type="time" value="14:00" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-purple-500 font-mono">
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Type / Category</label>
+          <select id="cal-form-type" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-white focus:outline-none focus:border-purple-500">
+            <option value="Deployment">Deployment</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Review">Review</option>
+            <option value="Backup">Backup</option>
+          </select>
+        </div>
+        <div class="pt-3 flex justify-end space-x-2">
+          <button type="button" id="cal-form-cancel" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-purple-500 hover:bg-purple-400 text-white font-semibold shadow-lg shadow-purple-500/20">Schedule</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

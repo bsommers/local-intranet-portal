@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>System & Repository Health Audit</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 2rem; }
+    h1 { color: #38bdf8; border-bottom: 2px solid #334155; padding-bottom: 0.5rem; }
+    .card { background: #1e293b; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #334155; }
+    .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold; background: #22c55e; color: #022c22; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #334155; }
+    th { color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <h1>Machine & Ecosystem Audit Report</h1>
+  <div class="card">
+    <h2>Environment Status: <span class="badge">HEALTHY</span></h2>
+    <p>Local intranet web server active on port 8080. Reverse proxy linked to Python API on 8081.</p>
+    <table>
+      <thead>
+        <tr><th>Resource</th><th>Path</th><th>Type</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Primary Development</td><td>~/src</td><td>Git Repositories</td><td>Online</td></tr>
+        <tr><td>Ecosystem Storage</td><td>~/ecosystem</td><td>Workspaces & Archives</td><td>Online</td></tr>
+        <tr><td>Reverse Proxy</td><td>nginx:8080</td><td>HTTP Gateway</td><td>Active</td></tr>
+        <tr><td>Micro-Frameworks Substrate</td><td>/api/plugins/</td><td>Dynamic Modules</td><td>Ready</td></tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

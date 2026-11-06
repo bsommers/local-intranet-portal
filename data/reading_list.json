@@ -1,0 +1,67 @@
+[
+  {
+    "id": 101,
+    "title": "BARE-AI: Bit-Flip Attack Resilience in AI Hardware through Built-in Performance Monitors",
+    "author": "Habibur Rahaman, Swastik Bhattacharya, Sanjay Das, Kanad Basu, Swarup Bhunia",
+    "category": "Hardware Security",
+    "tag": "Hardware Security",
+    "priority": "High",
+    "status": "Reading",
+    "url": "https://arxiv.org/abs/2610.08739v2",
+    "repo_url": "https://github.com/bsommers/reading-db",
+    "source": "github.com/bsommers/reading-db",
+    "notes": "Published corpus item in bsommers/reading-db. Evaluates on-chip telemetry monitors to detect fault injection and targeted bit-flip attacks in AI hardware accelerators."
+  },
+  {
+    "id": 102,
+    "title": "UCLID5: Multi-Modal Formal Modeling, Verification, and Synthesis",
+    "author": "Elizabeth Polgreen, Kevin Cheang, Sanjit A. Seshia, et al.",
+    "category": "Formal Verification",
+    "tag": "Formal Verification",
+    "priority": "Medium",
+    "status": "Completed",
+    "url": "https://arxiv.org/abs/2208.03699",
+    "repo_url": "https://github.com/bsommers/reading-db",
+    "source": "github.com/bsommers/reading-db",
+    "notes": "Published corpus item in bsommers/reading-db. Formal modeling framework for multi-modal systems, transition systems, and verification."
+  },
+  {
+    "id": 103,
+    "title": "A Rowhammer attack on Fil-C's software capabilities",
+    "author": "Amir Naseredini, Suhas Viswanath, Martin Berger",
+    "category": "Systems Security",
+    "tag": "Systems Security",
+    "priority": "High",
+    "status": "To Read",
+    "url": "https://arxiv.org/abs/2610.33748",
+    "repo_url": "https://github.com/bsommers/reading-db",
+    "source": "github.com/bsommers/reading-db",
+    "notes": "Published corpus item in bsommers/reading-db. Investigates memory hardware attacks bypassing capability-based memory safety runtimes."
+  },
+  {
+    "id": 104,
+    "title": "Synthesis Note: Cross-Layer Bit-Flip Resilience Across AI Accelerators",
+    "author": "Bill Sommers",
+    "category": "Architecture",
+    "tag": "Architecture",
+    "priority": "High",
+    "status": "Reading",
+    "url": "https://github.com/bsommers/reading-db",
+    "repo_url": "https://github.com/bsommers/reading-db",
+    "source": "github.com/bsommers/reading-db",
+    "notes": "Note from bsommers/reading-db synthesizing cross-layer fault resilience and capability runtimes."
+  },
+  {
+    "id": 105,
+    "title": "Designing Data-Intensive Applications",
+    "author": "Martin Kleppmann",
+    "category": "Architecture",
+    "tag": "Architecture",
+    "priority": "Medium",
+    "status": "In Progress",
+    "url": "https://dataintensive.net",
+    "repo_url": "https://dataintensive.net",
+    "source": "Local Reference",
+    "notes": "Fundamental patterns for distributed data storage, replication, and consensus."
+  }
+]
