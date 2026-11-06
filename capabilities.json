@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "local-intranet-portal",
+  "version": "1.0.0",
+  "capabilities": [
+    {
+      "id": "cap-telemetry",
+      "category": "Observability",
+      "name": "Live Linux kernel resource monitoring",
+      "status": "verified",
+      "endpoint": "/api/system/status",
+      "method": "GET"
+    },
+    {
+      "id": "cap-src-viewer",
+      "category": "Developer Tools",
+      "name": "Dual source tree explorer for ~/src and ~/ecosystem",
+      "status": "verified",
+      "endpoint": "/api/sources/list",
+      "method": "GET"
+    },
+    {
+      "id": "cap-reading-db",
+      "category": "Knowledge Hub",
+      "name": "Hyperlinked reading list with bsommers/reading-db sync",
+      "status": "verified",
+      "endpoint": "/api/reading-list",
+      "method": "GET"
+    },
+    {
+      "id": "cap-math-repl",
+      "category": "Computation",
+      "name": "Safe arithmetic & mathematical formula evaluator",
+      "status": "verified",
+      "endpoint": "/api/plugins/math_runner",
+      "method": "POST"
+    },
+    {
+      "id": "cap-plugins",
+      "category": "Extensibility",
+      "name": "Hot-pluggable Python microservice substrate",
+      "status": "verified",
+      "endpoint": "/api/plugins",
+      "method": "GET"
+    },
+    {
+      "id": "cap-container",
+      "category": "Deployment",
+      "name": "Hermetic container runtime (Docker / Podman / Buildah)",
+      "status": "verified",
+      "endpoint": "Dockerfile",
+      "method": "CLI"
+    },
+    {
+      "id": "cap-lan-reach",
+      "category": "Networking",
+      "name": "Dual-stack 0.0.0.0 and [::] LAN binding",
+      "status": "verified",
+      "endpoint": "0.0.0.0:8088",
+      "method": "TCP"
+    }
+  ]
+}

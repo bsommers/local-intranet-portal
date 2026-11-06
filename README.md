@@ -82,3 +82,12 @@ Stop server:
 ```bash
 ./stop.sh
 ```
+
+---
+
+## 📚 Living Documentation
+
+- **[System Capabilities](CAPABILITIES.md)** ([Machine-readable JSON](capabilities.json))
+- **[Architecture & Design](docs/ARCHITECTURE.md)**
+- **[Changelog](docs/CHANGELOG.md)**
+- **Doc Coherence Validation:** `python3 scripts/check_docs.py`
